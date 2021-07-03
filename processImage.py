@@ -1,8 +1,14 @@
+from os import curdir
 import numpy as np
 import cv2 
 import pytesseract
 # pytesseract install guide to windows https://stackoverflow.com/questions/50951955/pytesseract-tesseractnotfound-error-tesseract-is-not-installed-or-its-not-i
 pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+from matplotlib import image
+from matplotlib import pyplot
+
+# !TODO add checking to find out if goal is reached
 def getMetaData(img):
 
     #Speed and time are always in place in picture
@@ -33,13 +39,12 @@ def getMetaData(img):
 def processImage(img=None):
     if not img:
         # Load default image
-        img = cv2.imread('trackmania-first-person.png', cv2.IMREAD_UNCHANGED)
+        img = cv2.imread(r'TrackmaniaAI\trackmania-first-person.png', cv2.IMREAD_UNCHANGED)
         width = 800
         height = 600 
         dim = (width, height)
- 
         # resize image
         img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
     
-    processed_img = cv2.Canny(img, threshold1=300, threshold2=400)
-    return processed_img
+    #processed_img = cv2.Canny(img, threshold1=300, threshold2=400)
+    return img
