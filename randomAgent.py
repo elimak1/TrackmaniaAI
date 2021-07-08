@@ -13,20 +13,19 @@ from tmEnvironment import tmEnv
 
 def test_run():
     # Wait for me to push B to start
-    keyboard.wait('B')
+    keyboard.wait('b')
     done = False
     score = 0
     env = tmEnv()
     env.reset()
     while not done:
         action=env.action_space.sample()
+        # always go forward
+        action[0] = 1
+        print(action)
         state,reward,done,info = env.step(action)
         score+=reward
     print("SCORE:", score)
-    cv2.imshow("Fall", state[0])
-    cv2.waitKey(0) # waits until a key is pressed
-    cv2.destroyAllWindows() # destroys the window showing image
     print("DONE")
 
 test_run()
-
