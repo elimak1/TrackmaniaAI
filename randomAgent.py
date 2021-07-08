@@ -22,7 +22,6 @@ def test_run():
         action=env.action_space.sample()
         # always go forward
         action[0] = 1
-        print(action)
         state,reward,done,info = env.step(action)
         score+=reward
     print("SCORE:", score)

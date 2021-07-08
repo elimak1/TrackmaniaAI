@@ -10,7 +10,7 @@ from captureWindow import captureWindow
 from processImage import getMetaData, processImage
 
 TOPSPEED = 1000
-MAXHUNDREDS = 1000 #10 seconds
+MAXHUNDREDS = 2000 #20 seconds
 SLEEPY = 0.033
 
 class tmEnv(gym.Env):
@@ -23,46 +23,53 @@ class tmEnv(gym.Env):
 
         
     def step(self,action):
-        self.release_all()
-        if(action[0]):
+        """if(action[0]):
             keyboard.press("w")
+        else:
+            keyboard.release("w")
         if(action[1]):
             keyboard.press("a")
+        else:
+            keyboard.release("a")
         if(action[2]):
             keyboard.press("d")
+        else:
+            keyboard.release("d")
         if(action[3]):
             keyboard.press("s")
+        else:
+            keyboard.release("s")"""
         
-        self.limit+=1
-        
-        
+        start = timeit.default_timer()
         img = captureWindow()
         img = processImage(img)
-        
         
 
         # this for testing
         # img = processImage()
 
-        start = timeit.default_timer()
-        speed, hundreds = getMetaData(img, self.speed)
+        
+        speed, hundreds, finish = getMetaData(img, self.speed)
         self.speed = speed
 
         hundreds = (timeit.default_timer() - self.start)*100
 
         stop = timeit.default_timer()
-        #print(stop-start)
         t = SLEEPY+stop-start
         if(t<0):
             t=0
         time.sleep(t)
         # Calculate reward
-        reward = speed/TOPSPEED - hundreds/1000
+        reward = 40*speed/TOPSPEED - hundreds/200
+        print(reward)
 
         # Episode end
         done = False
         # limit to stop for testint purposes
-        if(hundreds>MAXHUNDREDS or self.limit>50):
+        if(hundreds>MAXHUNDREDS or finish):
+            if(finish):
+                reward +=100
+                
             done = True
             self.release_all()
         # also if finished
