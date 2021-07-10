@@ -7,18 +7,18 @@ import time
 import timeit
 import cv2
 from captureWindow import captureWindow
-from processImage import getMetaData, processImage
+from processImage import processImage
+from getGameState import getGameState
 
 TOPSPEED = 1000
-MAXHUNDREDS = 2000 #20 seconds
+MAXMS = 20000 #20 seconds
 SLEEPY = 0.033
 
 class tmEnv(gym.Env):
     def __init__(self):
         self.action_space = MultiBinary(4)
-        self.observation_space = Dict({"speed":Discrete(TOPSPEED), "time":Discrete(MAXHUNDREDS), "pic":Box(0,256,shape=(600,800,3),dtype=int)})
-        self.limit = 0
-        self.start = timeit.default_timer()
+        self.observation_space = Dict({"speed":Discrete(TOPSPEED), "time":Discrete(MAXMS), "pic":Box(0,256,shape=(600,800,3),dtype=int)})
+        self.time = 0
         self.speed = 0
 
         
@@ -43,15 +43,10 @@ class tmEnv(gym.Env):
         start = timeit.default_timer()
         img = captureWindow()
         img = processImage(img)
-        
 
-        # this for testing
-        # img = processImage()
-
-        speed, hundreds, finish = getMetaData(img, self.speed)
+        speed, ms, finish = getGameState((self.speed,self.time,False))
         self.speed = speed
-
-        hundreds = (timeit.default_timer() - self.start)*100
+        self.time = ms
 
         stop = timeit.default_timer()
         t = SLEEPY+stop-start
@@ -59,12 +54,14 @@ class tmEnv(gym.Env):
             t=0
         time.sleep(t)
         # Calculate reward
-        reward = 40*speed/TOPSPEED - hundreds/200
+        reward = 40*speed/TOPSPEED - ms/2000
+
+
 
         # Episode end
         done = False
-        # limit to stop for testint purposes
-        if(hundreds>MAXHUNDREDS or finish):
+
+        if(ms>MAXMS or (ms>0 and finish)):
             if(finish):
                 reward +=100
 
@@ -72,7 +69,7 @@ class tmEnv(gym.Env):
             self.release_all()
         # also if finished
         info = {}
-        return dict({"speed":speed, "time":hundreds, "pic":img}), reward,done,info
+        return dict({"speed":speed, "time":ms, "pic":img}), reward,done,info
 
         
 
@@ -85,7 +82,7 @@ class tmEnv(gym.Env):
         keyboard.press("l")
         keyboard.release("l")
         # wait for countdown timer
-        time.sleep(2)
+        time.sleep(1.5)
         self.start = timeit.default_timer()
 
     def release_all(self):
