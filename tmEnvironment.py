@@ -23,7 +23,7 @@ class tmEnv(gym.Env):
 
         
     def step(self,action):
-        """if(action[0]):
+        if(action[0]):
             keyboard.press("w")
         else:
             keyboard.release("w")
@@ -38,7 +38,7 @@ class tmEnv(gym.Env):
         if(action[3]):
             keyboard.press("s")
         else:
-            keyboard.release("s")"""
+            keyboard.release("s")
         
         start = timeit.default_timer()
         img = captureWindow()
@@ -48,7 +48,6 @@ class tmEnv(gym.Env):
         # this for testing
         # img = processImage()
 
-        
         speed, hundreds, finish = getMetaData(img, self.speed)
         self.speed = speed
 
@@ -61,7 +60,6 @@ class tmEnv(gym.Env):
         time.sleep(t)
         # Calculate reward
         reward = 40*speed/TOPSPEED - hundreds/200
-        print(reward)
 
         # Episode end
         done = False
@@ -69,7 +67,7 @@ class tmEnv(gym.Env):
         if(hundreds>MAXHUNDREDS or finish):
             if(finish):
                 reward +=100
-                
+
             done = True
             self.release_all()
         # also if finished
