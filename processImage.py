@@ -1,4 +1,4 @@
-import numpy as np
+import numpy
 import cv2 
 
 def processImage(img=None):
@@ -13,6 +13,5 @@ def processImage(img=None):
         # resize image
         img = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
  
-    #processed_img = cv2.Canny(img, threshold1=300, threshold2=400)
+    img = cv2.resize(img, (400,300), interpolation = cv2.INTER_AREA)
     return img
-

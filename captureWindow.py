@@ -18,5 +18,10 @@ def captureWindow():
             "mon": monitor_number,
         }
         # Grab the data
-        img = np.array(sct.grab(monitor))
-    return img
+        im = sct.grab(monitor)
+    return numpy_flip(im)
+
+def numpy_flip(im):
+    """ Most efficient Numpy version as of now. """
+    frame = np.array(im, dtype=np.uint8)
+    return np.flip(frame[:, :, :3], 2)
