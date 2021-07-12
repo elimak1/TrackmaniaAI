@@ -1,13 +1,4 @@
-import random
-import time
-import cv2
-
-# import pydirectinput
 import keyboard
-
-from matplotlib.pyplot import imshow
-
-from captureWindow import captureWindow
 from tmEnvironment import tmEnv
 
 

@@ -5,9 +5,6 @@ Copy this file to openplanet scripts folder, more info about openplanet at https
 #author "elimak"
 #category "In Game"
 // https://next.openplanet.nl/ShootMania/CSmScriptPlayer for ScriptAPI class members
-
-
-
 void Main(){
 	while(true){
 		while(cast<CTrackManiaNetwork>(GetApp().Network).ClientManiaAppPlayground !is null) //This will replace <scripts> parts, it'll be active as long as the UI can be loaded
@@ -35,16 +32,12 @@ void Main(){
 
 			string speed = ""+plr_api.DisplaySpeed;
 			string raceTime = ""+plr_api.CurrentRaceTime;
-			uint checkpoint = game_player.CurrentLaunchedRespawnLandmarkIndex;
+			uint checkpoint = game_player.CurrentStoppedRespawnLandmarkIndex;
 
-			string finished = "False";
-			if(checkpoint == 0){
-				finished="True";
-			}
-
+			print(speed+";"+raceTime+";"+checkpoint);
 			IO::File f("gameState.txt");
 			f.Open(IO::FileMode::Write);
-			f.WriteLine(speed+";"+raceTime+";"+finished);
+			f.WriteLine(speed+";"+raceTime+";"+checkpoint);
 			f.Close();
 			sleep(10);
 		}

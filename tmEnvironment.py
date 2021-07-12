@@ -10,9 +10,13 @@ from captureWindow import captureWindow
 from processImage import processImage
 from getGameState import getGameState
 
+
+
 TOPSPEED = 1000
 MAXMS = 20000 #20 seconds
 SLEEPY = 0.033
+
+
 
 class tmEnv(gym.Env):
     def __init__(self):
@@ -24,6 +28,8 @@ class tmEnv(gym.Env):
         img = captureWindow()
         self.state = processImage(img)
         self.score = 0
+        self.finishcp = 0
+        self.lastcp = -1
 
         
     def step(self,action):
@@ -48,7 +54,7 @@ class tmEnv(gym.Env):
         img = captureWindow()
         self.state = processImage(img)
 
-        speed, ms, finish = getGameState((self.speed,self.time,False))
+        speed, ms, checkpoint = getGameState()
         self.speed = speed
         self.time = ms
 
@@ -58,22 +64,36 @@ class tmEnv(gym.Env):
             t=0
         #time.sleep(t)
         # Calculate reward
-        reward = 40*speed/TOPSPEED - ms/2000
+        #reward = 60*speed/TOPSPEED - ms/4000
+        reward = 0
+        reward += speed/100
 
-        self.score+=reward
+        # reward reaching next checkpoint
+        if(checkpoint != self.lastcp and ms>1000):
+            reward+= 100*(MAXMS/ms)*(checkpoint+1)
+            self.lastcp = checkpoint
+            
+
+
+        
 
         # Episode end
         done = False
 
-        if(ms>MAXMS or (ms>0 and finish)):
-            if(finish):
-                reward +=1000
+        # Car stopped after beginning, usually means stuck
+        """if(speed<2 and ms>1000):
+            reward-=10000
+            done= True
+            self.release_all()"""
 
+        if(ms>MAXMS or (ms>1000 and checkpoint==self.finishcp)):
+            if(checkpoint==self.finishcp and ms>1000):
+                reward +=10000
             done = True
             self.release_all()
         # also if finished
         info = {}
-        # state = Dict({"speed":Discrete(speed), "time":Discrete(ms), "pic":Box(img,dtype=int)})
+        self.score+=reward
         return self.state, reward,done,info
 
         
@@ -83,13 +103,20 @@ class tmEnv(gym.Env):
 
     def reset(self):
         self.limit=0
+        cv2.destroyAllWindows()
         print(self.score)
         self.score=0
         # restart race
         keyboard.press("l")
         keyboard.release("l")
+        
         # wait for countdown timer
-        time.sleep(1.5)
+        time.sleep(1.7)
+        # at the beginning checkpoints is the amount of cp in map
+        # when reaching first checkpoint counter goes to 0 and finish is at
+        # beginning -1
+        _,_,self.lastcp = getGameState()
+        self.finishcp-= self.lastcp-1
         self.start = timeit.default_timer()
         return self.state
 
